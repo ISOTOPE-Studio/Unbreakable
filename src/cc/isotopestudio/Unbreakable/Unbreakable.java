@@ -8,7 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Unbreakable extends JavaPlugin {
     private static final String pluginName = "Unbreakable";
-    public static Unbreakable plugin;
+    static Unbreakable plugin;
 
     @Override
     public void onEnable() {
