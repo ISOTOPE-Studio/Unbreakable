@@ -7,15 +7,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="spigot-api-1.11.2-R0.1-SNAPSHOT-shaded" level="application" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MAVEN_REPOSITORY$/org/bukkit/bukkit/1.7.2-R0.3/bukkit-1.7.2-R0.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/ItemDurability2.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MAVEN_REPOSITORY$/org/bukkit/bukkit/1.7.2-R0.3/bukkit-1.7.2-R0.3.jar!/" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

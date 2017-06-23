@@ -4,4 +4,8 @@ main: cc.isotopestudio.Unbreakable.Unbreakable
 author: Mars
 description: Unbreakable
 website: http://isotopestudio.cc
-version: 1.0.0
+version: 1.1.0
+commands:
+  naijiu:
+    description: Unbreakable
+    usage: /<command>

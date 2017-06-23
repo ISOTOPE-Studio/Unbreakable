@@ -3,6 +3,7 @@ package cc.isotopestudio.Unbreakable;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -10,6 +11,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -26,17 +28,24 @@ import static cc.isotopestudio.Unbreakable.Unbreakable.plugin;
  */
 public class ArmorListener implements Listener {
 
-    private static boolean isUnbreakable(ItemStack item) {
+    static boolean isUnbreakable(ItemStack item) {
         try {
-            return item.getItemMeta().getLore().contains("¡ìa·À±¬");
+            return item.getItemMeta().getLore().contains(Unbreakable.lore);
         } catch (Exception ignored) {
         }
         return false;
     }
 
-    private static ItemStack handleUnbreakable(ItemStack item) {
+    static ItemStack handleUnbreakable(ItemStack item) {
         item.setDurability((short) 0);
         return item;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onArmor(PlayerItemDamageEvent event) {
+        if (isUnbreakable(event.getItem())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -52,10 +61,10 @@ public class ArmorListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        ItemStack item = event.getPlayer().getItemInHand();
+        ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
         if (isUnbreakable(item)) {
             item.setDurability((short) 0);
-            event.getPlayer().setItemInHand(item);
+            event.getPlayer().getInventory().setItemInMainHand(item);
         }
     }
 
@@ -86,7 +95,7 @@ public class ArmorListener implements Listener {
                 event.getPlayer().getEquipment().setBoots(item);
                 return;
             }
-            event.getPlayer().setItemInHand(item);
+            event.getPlayer().getInventory().setItemInMainHand(item);
         }
     }
 
@@ -109,40 +118,50 @@ public class ArmorListener implements Listener {
                 equipTypeItemStackMap.put(EquipType.BOOTS, equipment.getBoots());
             }
             if (equipTypeItemStackMap.size() > 0) {
-                System.out.print(player.getName() + " " + player.getHealth() + ": " + event.getCause());
-
-                for (ItemStack item : equipTypeItemStackMap.values()) {
-                    System.out.print(item.getType() + " " + item.getDurability());
-                }
                 for (EquipType type : EquipType.values()) {
                     if (equipTypeItemStackMap.get(type) != null) {
                         switch (type) {
                             case HELMET: {
-                                player.getEquipment().setHelmet(handleUnbreakable(equipTypeItemStackMap.get(type)));
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        player.getEquipment().setHelmet(handleUnbreakable(equipTypeItemStackMap.get(type)));
+                                    }
+                                }.runTaskLater(plugin,2L);
                                 break;
                             }
                             case CHESTPLATE: {
                                 player.getEquipment().setChestplate(handleUnbreakable(equipTypeItemStackMap.get(type)));
 
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        player.getEquipment().setHelmet(handleUnbreakable(equipTypeItemStackMap.get(type)));
+                                    }
+                                }.runTaskLater(plugin,2L);
                                 break;
                             }
                             case LEGGINGS: {
-                                player.getEquipment().setLeggings(handleUnbreakable(equipTypeItemStackMap.get(type)));
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        player.getEquipment().setLeggings(handleUnbreakable(equipTypeItemStackMap.get(type)));
+                                    }
+                                }.runTaskLater(plugin,2L);
                                 break;
                             }
                             case BOOTS: {
-                                player.getEquipment().setBoots(handleUnbreakable(equipTypeItemStackMap.get(type)));
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        player.getEquipment().setBoots(handleUnbreakable(equipTypeItemStackMap.get(type)));
+                                    }
+                                }.runTaskLater(plugin,2L);
                                 break;
                             }
                         }
                     }
                 }
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-
-                    }
-                }.runTaskLater(plugin, 1);
             }
         }
     }
@@ -156,12 +175,12 @@ public class ArmorListener implements Listener {
             return;
         }
         final Player player = (Player) event.getEntity().getShooter();
-        final ItemStack item = player.getItemInHand();
+        final ItemStack item = player.getInventory().getItemInMainHand();
         if (isUnbreakable(item)) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    player.setItemInHand(handleUnbreakable(item));
+                    player.getInventory().setItemInMainHand(handleUnbreakable(item));
                 }
             }.runTaskLater(plugin, 1);
         }
@@ -176,12 +195,12 @@ public class ArmorListener implements Listener {
             return;
         }
         final Player player = (Player) event.getDamager();
-        final ItemStack item = player.getItemInHand();
+        final ItemStack item = player.getInventory().getItemInMainHand();
         if (isUnbreakable(item)) {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    player.setItemInHand(handleUnbreakable(item));
+                    player.getInventory().setItemInMainHand(handleUnbreakable(item));
                 }
             }.runTaskLater(plugin, 1);
         }
@@ -191,7 +210,7 @@ public class ArmorListener implements Listener {
         HELMET,
         CHESTPLATE,
         LEGGINGS,
-        BOOTS;
+        BOOTS
     }
 
 }
